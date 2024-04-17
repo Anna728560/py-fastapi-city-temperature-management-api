@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 import models
 import database
-
+import temp_script
 
 
 def get_all_temperatures(db: Session = Depends(database.get_db)):
@@ -34,15 +34,25 @@ def update_all_temperatures(
     cities = db.query(models.City).all()
 
     for city in cities:
-        #  api weather logic
-        temperature_data = {
-            "temperature": 25.5
-        }
-        new_temperature = models.Temperature(
-            city_id=city.id,
-            temperature=temperature_data["temperature"]
-        )
-        db.add(new_temperature)
+        try:
+            temperature_data = temp_script.get_weather(city)
+            temperature = db.query(models.Temperature).filter(
+                models.Temperature.city_id == city.id
+            ).first()
+            if temperature:
+                temperature.date_time = temperature_data["date_time"]
+                temperature.temperature = temperature_data["temperature"]
+            else:
+                new_temperature = models.Temperature(
+                    city_id=city.id,
+                    date_time=temperature_data["date_time"],
+                    temperature=temperature_data["temperature"]
+                )
+                db.add(new_temperature)
+
+        except ValueError as e:
+            print(f"Failed to update temperature data for city {city.name}: {str(e)}")
+            continue
 
     db.commit()
     return "Temperature data updated successfully"
