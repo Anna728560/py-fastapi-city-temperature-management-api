@@ -13,7 +13,7 @@ app = FastAPI()
 
 @app.post("/cities/", status_code=status.HTTP_201_CREATED)
 def create_city(
-        request: schemas.CitySchema,
+        request: schemas.City,
         db: Session = Depends(database.get_db),
 ):
     db_city = models.City(
@@ -26,7 +26,7 @@ def create_city(
     return db_city
 
 
-@app.get("/cities/{id}", status_code=status.HTTP_200_OK)
+@app.get("/cities/{city_id}/", status_code=status.HTTP_200_OK)
 def get_city(
         city_id: int,
         db: Session = Depends(database.get_db)
@@ -45,3 +45,18 @@ def get_city(
 def get_cities(db: Session = Depends(database.get_db)):
     cities = db.query(models.City).all()
     return cities
+
+
+@app.put("/cities/{city_id}/", status_code=status.HTTP_202_ACCEPTED)
+def update_city(
+        city_id: int,
+        city: schemas.City,
+        db: Session = Depends(database.get_db)
+):
+    db_city = get_city(city_id, db)
+
+    for attr, value in city.dict().items():
+        setattr(db_city, attr, value)
+
+    db.commit()
+    return "Updated"
