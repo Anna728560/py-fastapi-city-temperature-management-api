@@ -1,11 +1,16 @@
-from fastapi import FastAPI, Depends, status, HTTPException
+from fastapi import FastAPI, Depends, status
 
 from sqlalchemy.orm import Session
 
-import models
 import schemas
 import database
-from database import SessionLocal
+from crud.city_crud import (
+    create_new_city,
+    get_city_by_id,
+    get_all_cities,
+    update_city_by_id,
+    delete_city_by_id
+)
 
 
 app = FastAPI()
@@ -16,14 +21,7 @@ def create_city(
         request: schemas.City,
         db: Session = Depends(database.get_db),
 ):
-    db_city = models.City(
-        name=request.name,
-        additional_info=request.additional_info,
-    )
-    db.add(db_city)
-    db.commit()
-    db.refresh(db_city)
-    return db_city
+    return create_new_city(request=request, db=db)
 
 
 @app.get("/cities/{city_id}/", status_code=status.HTTP_200_OK)
@@ -31,20 +29,12 @@ def get_city(
         city_id: int,
         db: Session = Depends(database.get_db)
 ):
-    city = db.query(models.City).filter(models.City.id == city_id).first()
-    if not city:
-        return HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"City with the id {city_id} does not exist"
-        )
-
-    return city
+    return get_city_by_id(city_id=city_id, db=db)
 
 
 @app.get("/cities/", status_code=status.HTTP_200_OK)
 def get_cities(db: Session = Depends(database.get_db)):
-    cities = db.query(models.City).all()
-    return cities
+    return get_all_cities(db=db)
 
 
 @app.put("/cities/{city_id}/", status_code=status.HTTP_202_ACCEPTED)
@@ -53,13 +43,7 @@ def update_city(
         city: schemas.City,
         db: Session = Depends(database.get_db)
 ):
-    db_city = get_city(city_id, db)
-
-    for attr, value in city.dict().items():
-        setattr(db_city, attr, value)
-
-    db.commit()
-    return "Updated"
+    return update_city_by_id(city_id=city_id, city=city, db=db)
 
 
 @app.delete("/cities/{city_id}/", status_code=status.HTTP_200_OK)
@@ -67,7 +51,4 @@ def delete_city(
         city_id: int,
         db: Session = Depends(database.get_db)
 ):
-    db_city = get_city(city_id, db)
-    db.delete(db_city)
-    db.commit()
-    return "Deleted"
+    return delete_city_by_id(city_id=city_id, db=db)
