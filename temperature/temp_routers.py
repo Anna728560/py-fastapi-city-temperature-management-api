@@ -20,8 +20,8 @@ router = APIRouter(
 
 
 @router.post("/update/")
-def update_temperatures(db: Session = Depends(database.get_db)):
-    return update_all_temperatures(db=db)
+async def update_temperatures(db: Session = Depends(database.get_db)):
+    return await update_all_temperatures(db=db)
 
 
 @router.get(
