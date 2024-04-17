@@ -39,3 +39,9 @@ def get_city(
         )
 
     return city
+
+
+@app.get("/cities/", status_code=status.HTTP_200_OK)
+def get_cities(db: Session = Depends(database.get_db)):
+    cities = db.query(models.City).all()
+    return cities
