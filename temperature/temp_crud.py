@@ -1,3 +1,6 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+
 import asyncio
 
 from fastapi import Depends, HTTPException, status
@@ -33,6 +36,7 @@ async def update_all_temperatures(
        db: Session = Depends(database.get_db)
 ):
     cities = db.query(models.City).all()
+
     tasks = []
 
     for city in cities:
@@ -40,6 +44,7 @@ async def update_all_temperatures(
         tasks.append(task)
 
     await asyncio.gather(*tasks)
+    db.commit()
     return "Temperature data updated successfully"
 
 
@@ -49,6 +54,7 @@ async def update_temperature_for_city(city, db):
         temperature = db.query(models.Temperature).filter(
             models.Temperature.city_id == city.id
         ).first()
+
         if temperature:
             temperature.date_time = temperature_data["date_time"]
             temperature.temperature = temperature_data["temperature"]
