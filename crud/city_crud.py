@@ -3,11 +3,11 @@ from sqlalchemy.orm import Session
 
 import models
 import database
-import schemas
+from schemas import city_schemas
 
 
 def create_new_city(
-        request: schemas.City,
+        request: city_schemas.City,
         db: Session = Depends(database.get_db),
 ):
     db_city = models.City(
@@ -41,7 +41,7 @@ def get_all_cities(db: Session = Depends(database.get_db)):
 
 def update_city_by_id(
         city_id: int,
-        city: schemas.City,
+        city: city_schemas.City,
         db: Session = Depends(database.get_db)
 ):
     db_city = get_city_by_id(city_id, db)

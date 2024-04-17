@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 
 from sqlalchemy.orm import Session
 
-import schemas
+from schemas import temp_schemass
 import database
 from crud.temp_crud import (
     get_all_temperatures,
@@ -26,7 +26,7 @@ def update_temperatures(db: Session = Depends(database.get_db)):
 
 @router.get(
     "/",
-    response_model=List[schemas.Temperature]
+    response_model=List[temp_schemass.Temperature]
 )
 def get_temperatures(db: Session = Depends(database.get_db)):
     return get_all_temperatures(db=db)
@@ -38,4 +38,3 @@ def get_temperature_by_city(
         db: Session = Depends(database.get_db)
 ):
     return get_one_temperature_by_city_id(city_id=city_id, db=db)
-

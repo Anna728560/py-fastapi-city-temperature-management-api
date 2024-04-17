@@ -1,10 +1,9 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, status
-
 from sqlalchemy.orm import Session
 
-import schemas
+from schemas import city_schemas
 import database
 from crud.city_crud import (
     create_new_city,
@@ -26,7 +25,7 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
 )
 def create_city(
-        request: schemas.City,
+        request: city_schemas.City,
         db: Session = Depends(database.get_db),
 ):
     return create_new_city(request=request, db=db)
@@ -35,7 +34,7 @@ def create_city(
 @router.get(
     "/{city_id}/",
     status_code=status.HTTP_200_OK,
-    response_model=schemas.City,
+    response_model=city_schemas.CityDetail,
 )
 def get_city(
         city_id: int,
@@ -46,7 +45,7 @@ def get_city(
 
 @router.get(
     "/",
-    response_model=List[schemas.City],
+    response_model=List[city_schemas.City],
 )
 def get_cities(db: Session = Depends(database.get_db)):
     return get_all_cities(db=db)
@@ -58,7 +57,7 @@ def get_cities(db: Session = Depends(database.get_db)):
 )
 def update_city(
         city_id: int,
-        city: schemas.City,
+        city: city_schemas.City,
         db: Session = Depends(database.get_db)
 ):
     return update_city_by_id(city_id=city_id, city=city, db=db)
