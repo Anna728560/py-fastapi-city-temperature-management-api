@@ -60,3 +60,14 @@ def update_city(
 
     db.commit()
     return "Updated"
+
+
+@app.delete("/cities/{city_id}/", status_code=status.HTTP_200_OK)
+def delete_city(
+        city_id: int,
+        db: Session = Depends(database.get_db)
+):
+    db_city = get_city(city_id, db)
+    db.delete(db_city)
+    db.commit()
+    return "Deleted"
