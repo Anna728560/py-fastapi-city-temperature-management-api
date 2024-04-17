@@ -26,7 +26,7 @@ def get_city_by_id(
 ):
     city = db.query(models.City).filter(models.City.id == city_id).first()
     if not city:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"City with the id {city_id} does not exist"
         )
