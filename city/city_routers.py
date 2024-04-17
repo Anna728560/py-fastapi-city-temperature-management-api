@@ -24,11 +24,11 @@ router = APIRouter(
     "/",
     status_code=status.HTTP_201_CREATED,
 )
-def create_city(
+async def create_city(
         request: city_schemas.City,
         db: Session = Depends(database.get_db),
 ):
-    return create_new_city(request=request, db=db)
+    return await create_new_city(request=request, db=db)
 
 
 @router.get(
@@ -36,39 +36,39 @@ def create_city(
     status_code=status.HTTP_200_OK,
     response_model=city_schemas.CityDetail,
 )
-def get_city(
+async def get_city(
         city_id: int,
         db: Session = Depends(database.get_db)
 ):
-    return get_city_by_id(city_id=city_id, db=db)
+    return await get_city_by_id(city_id=city_id, db=db)
 
 
 @router.get(
     "/",
     response_model=List[city_schemas.City],
 )
-def get_cities(db: Session = Depends(database.get_db)):
-    return get_all_cities(db=db)
+async def get_cities(db: Session = Depends(database.get_db)):
+    return await get_all_cities(db=db)
 
 
 @router.put(
     "/{city_id}/",
     status_code=status.HTTP_202_ACCEPTED,
 )
-def update_city(
+async def update_city(
         city_id: int,
         city: city_schemas.City,
         db: Session = Depends(database.get_db)
 ):
-    return update_city_by_id(city_id=city_id, city=city, db=db)
+    return await update_city_by_id(city_id=city_id, city=city, db=db)
 
 
 @router.delete(
     "/{city_id}/",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-def delete_city(
+async def delete_city(
         city_id: int,
         db: Session = Depends(database.get_db)
 ):
-    return delete_city_by_id(city_id=city_id, db=db)
+    return await delete_city_by_id(city_id=city_id, db=db)

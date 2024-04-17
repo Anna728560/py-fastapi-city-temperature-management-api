@@ -34,14 +34,14 @@ async def get_one_temperature_by_city_id(
 async def update_all_temperatures(
        db: Session = Depends(database.get_db)
 ):
-    cities = db.execute(select(models.City))
-    cities = cities.scalars().all()
+    cities = db.execute(select(models.City)).scalars().all()
 
     tasks = []
 
     for city in cities:
         task = asyncio.create_task(update_temperature_for_city(city, db))
         tasks.append(task)
+        print({"c": city.temperatures})
 
     await asyncio.gather(*tasks)
     db.commit()
@@ -54,7 +54,7 @@ async def update_temperature_for_city(city: models.City, db: Session = Depends(d
 
         temperature = db.execute(
             select(models.Temperature).filter(models.Temperature.city_id == city.id)
-        ).scalars()
+        ).scalars().first()
 
         if temperature:
             temperature.date_time = temperature_data["date_time"]

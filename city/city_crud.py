@@ -1,11 +1,12 @@
 from fastapi import Depends, HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from db import models, database
 from city import city_schemas
 
 
-def create_new_city(
+async def create_new_city(
         request: city_schemas.City,
         db: Session = Depends(database.get_db),
 ):
@@ -19,11 +20,13 @@ def create_new_city(
     return db_city
 
 
-def get_city_by_id(
+async def get_city_by_id(
         city_id: int,
         db: Session = Depends(database.get_db)
 ):
-    city = db.query(models.City).filter(models.City.id == city_id).first()
+    city = db.execute(
+        select(models.City).filter(models.City.id == city_id)
+    ).scalars().first()
     if not city:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -33,17 +36,17 @@ def get_city_by_id(
     return city
 
 
-def get_all_cities(db: Session = Depends(database.get_db)):
-    cities = db.query(models.City).all()
-    return cities
+async def get_all_cities(db: Session = Depends(database.get_db)):
+    cities = db.execute(select(models.City))
+    return cities.scalars().all()
 
 
-def update_city_by_id(
+async def update_city_by_id(
         city_id: int,
         city: city_schemas.City,
         db: Session = Depends(database.get_db)
 ):
-    db_city = get_city_by_id(city_id, db)
+    db_city = await get_city_by_id(city_id, db)
 
     for attr, value in city.dict().items():
         setattr(db_city, attr, value)
@@ -52,11 +55,11 @@ def update_city_by_id(
     return "Updated"
 
 
-def delete_city_by_id(
+async def delete_city_by_id(
         city_id: int,
         db: Session = Depends(database.get_db)
 ):
-    db_city = get_city_by_id(city_id, db)
+    db_city = await get_city_by_id(city_id, db)
     db.delete(db_city)
     db.commit()
     return "Deleted"
