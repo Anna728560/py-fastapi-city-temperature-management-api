@@ -4,7 +4,7 @@ This FastAPI application manages city data and their corresponding temperature d
 1. City CRUD API: Manages city data including creation, retrieval, updating, and deletion of city records.
 2. Temperature API: Fetches current temperature data for cities and stores it in the database. Provides endpoints to retrieve temperature records.
 
-### Endpoints
+### Endpoints:
 
 * City:
     - `POST /cities`: Create a new city.
@@ -50,5 +50,5 @@ uvicorn main:app --reload
 * SQLAlchemy - SQL toolkit and Object-Relational Mapping (ORM) for Python
 * Alembic - Database migrations framework for Python's SQLAlchemy
 
-### Documentation
+### Documentation:
 ![img.png](img.png)
