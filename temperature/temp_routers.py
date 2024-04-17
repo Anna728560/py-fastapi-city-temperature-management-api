@@ -28,13 +28,13 @@ async def update_temperatures(db: Session = Depends(database.get_db)):
     "/",
     response_model=List[temp_schemass.Temperature]
 )
-def get_temperatures(db: Session = Depends(database.get_db)):
-    return get_all_temperatures(db=db)
+async def get_temperatures(db: Session = Depends(database.get_db)):
+    return await get_all_temperatures(db=db)
 
 
 @router.get("/{city_id}/")
-def get_temperature_by_city(
+async def get_temperature_by_city(
         city_id: int,
         db: Session = Depends(database.get_db)
 ):
-    return get_one_temperature_by_city_id(city_id=city_id, db=db)
+    return await get_one_temperature_by_city_id(city_id=city_id, db=db)

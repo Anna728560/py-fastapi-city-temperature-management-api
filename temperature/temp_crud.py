@@ -1,4 +1,3 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 import asyncio
@@ -10,18 +9,18 @@ from db import models, database
 from temperature import temp_script
 
 
-def get_all_temperatures(db: Session = Depends(database.get_db)):
-    temperatures = db.query(models.Temperature).all()
-    return temperatures
+async def get_all_temperatures(db: Session = Depends(database.get_db)):
+    temperatures = db.execute(select(models.Temperature))
+    return temperatures.scalars().all()
 
 
-def get_one_temperature_by_city_id(
+async def get_one_temperature_by_city_id(
         city_id: int,
         db: Session = Depends(database.get_db)
 ):
-    temperature = db.query(models.Temperature).filter(
-        models.Temperature.city_id == city_id
-    ).first()
+    temperature = db.execute(
+        select(models.Temperature).filter(models.Temperature.city_id == city_id)
+    ).scalars().first()
 
     if not temperature:
         raise HTTPException(
@@ -55,8 +54,7 @@ async def update_temperature_for_city(city: models.City, db: Session = Depends(d
 
         temperature = db.execute(
             select(models.Temperature).filter(models.Temperature.city_id == city.id)
-        )
-        temperature.scalars()
+        ).scalars()
 
         if temperature:
             temperature.date_time = temperature_data["date_time"]
