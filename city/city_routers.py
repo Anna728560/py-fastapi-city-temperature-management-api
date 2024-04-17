@@ -3,9 +3,9 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from schemas import city_schemas
-import database
-from crud.city_crud import (
+from city import city_schemas
+from db import database
+from city.city_crud import (
     create_new_city,
     get_city_by_id,
     get_all_cities,

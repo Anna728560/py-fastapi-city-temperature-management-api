@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from schemas.temp_schemass import Temperature
+from temperature.temp_schemass import Temperature
 
 
 class CityBase(BaseModel):

@@ -8,7 +8,7 @@ from sqlalchemy import (
     Float
 )
 
-from database import Base
+from db.database import Base
 
 
 class City(Base):

@@ -1,9 +1,8 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-import models
-import database
-from schemas import city_schemas
+from db import models, database
+from city import city_schemas
 
 
 def create_new_city(

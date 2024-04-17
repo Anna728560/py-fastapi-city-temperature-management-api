@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends
 
 from sqlalchemy.orm import Session
 
-from schemas import temp_schemass
-import database
-from crud.temp_crud import (
+from temperature import temp_schemass
+from db import database
+from temperature.temp_crud import (
     get_all_temperatures,
     get_one_temperature_by_city_id,
     update_all_temperatures,

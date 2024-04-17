@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 
-import models
-from routers import city_routers, temp_routers
-import database
-
+from db import models, database
+from temperature import temp_routers
+from city import city_routers
 
 app = FastAPI()
 
