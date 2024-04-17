@@ -35,7 +35,8 @@ def get_one_temperature_by_city_id(
 async def update_all_temperatures(
        db: Session = Depends(database.get_db)
 ):
-    cities = db.query(models.City).all()
+    cities = db.execute(select(models.City))
+    cities = cities.scalars().all()
 
     tasks = []
 
@@ -48,12 +49,14 @@ async def update_all_temperatures(
     return "Temperature data updated successfully"
 
 
-async def update_temperature_for_city(city, db):
+async def update_temperature_for_city(city: models.City, db: Session = Depends(database.get_db)):
     try:
         temperature_data = await temp_script.get_weather(city)
-        temperature = db.query(models.Temperature).filter(
-            models.Temperature.city_id == city.id
-        ).first()
+
+        temperature = db.execute(
+            select(models.Temperature).filter(models.Temperature.city_id == city.id)
+        )
+        temperature.scalars()
 
         if temperature:
             temperature.date_time = temperature_data["date_time"]
