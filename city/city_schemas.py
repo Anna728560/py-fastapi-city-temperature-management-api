@@ -13,7 +13,7 @@ class CityBase(BaseModel):
 class City(CityBase):
 
     class Config:
-        orm_mode = True
+        from_attribute = True
 
 
 class CityDetail(CityBase):
@@ -21,4 +21,4 @@ class CityDetail(CityBase):
     temperatures: List[Temperature]
 
     class Config:
-        orm_mode = True
+        from_attribute = True
