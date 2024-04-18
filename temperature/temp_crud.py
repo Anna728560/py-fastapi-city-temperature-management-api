@@ -5,7 +5,8 @@ import asyncio
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from db import models, database
+from db import database
+import models
 from temperature import temp_script
 
 

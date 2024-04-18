@@ -72,3 +72,5 @@ async def delete_city(
         db: Session = Depends(database.get_db)
 ):
     return await delete_city_by_id(city_id=city_id, db=db)
+
+import requests

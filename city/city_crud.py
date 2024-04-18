@@ -2,7 +2,8 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from db import models, database
+from db import database
+import models
 from city import city_schemas
 
 
