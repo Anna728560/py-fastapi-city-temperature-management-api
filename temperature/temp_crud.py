@@ -42,31 +42,35 @@ async def update_all_temperatures(
     for city in cities:
         task = asyncio.create_task(update_temperature_for_city(city, db))
         tasks.append(task)
-        print({"c": city.temperatures})
 
     await asyncio.gather(*tasks)
     db.commit()
     return "Temperature data updated successfully"
 
 
-async def update_temperature_for_city(city: models.City, db: Session = Depends(database.get_db)):
+async def get_temperature_data(city: models.City) -> dict:
     try:
         temperature_data = await temp_script.get_weather(city)
-
-        temperature = db.execute(
-            select(models.Temperature).filter(models.Temperature.city_id == city.id)
-        ).scalars().first()
-
-        if temperature:
-            temperature.date_time = temperature_data["date_time"]
-            temperature.temperature = temperature_data["temperature"]
-        else:
-            new_temperature = models.Temperature(
-                city_id=city.id,
-                date_time=temperature_data["date_time"],
-                temperature=temperature_data["temperature"]
-            )
-            db.add(new_temperature)
-
+        return temperature_data
     except ValueError as error:
-        print(f"Failed to update temperature data for city {city.name}: {str(error)}")
+        print(f"Failed to get temperature data for city {city.name}: {str(error)}")
+        return {}
+
+
+async def update_temperature_for_city(city: models.City, db: Session = Depends(database.get_db)):
+    temperature_data = await get_temperature_data(city)
+
+    temperature = db.execute(
+        select(models.Temperature).filter(models.Temperature.city_id == city.id)
+    ).scalars().first()
+
+    if temperature:
+        temperature.date_time = temperature_data["date_time"]
+        temperature.temperature = temperature_data["temperature"]
+    else:
+        new_temperature = models.Temperature(
+            city_id=city.id,
+            date_time=temperature_data["date_time"],
+            temperature=temperature_data["temperature"]
+        )
+        db.add(new_temperature)

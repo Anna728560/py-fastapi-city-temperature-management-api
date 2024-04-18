@@ -1,5 +1,4 @@
 from fastapi import Depends, HTTPException, status
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from db import database
@@ -7,7 +6,7 @@ import models
 from city import city_schemas
 
 
-async def create_new_city(
+def create_new_city(
         request: city_schemas.City,
         db: Session = Depends(database.get_db),
 ):
@@ -21,13 +20,12 @@ async def create_new_city(
     return db_city
 
 
-async def get_city_by_id(
+def get_city_by_id(
         city_id: int,
         db: Session = Depends(database.get_db)
 ):
-    city = db.execute(
-        select(models.City).filter(models.City.id == city_id)
-    ).scalars().first()
+    city = db.query(models.City).filter(models.City.id == city_id).first()
+
     if not city:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -37,17 +35,17 @@ async def get_city_by_id(
     return city
 
 
-async def get_all_cities(db: Session = Depends(database.get_db)):
-    cities = db.execute(select(models.City))
-    return cities.scalars().all()
+def get_all_cities(db: Session = Depends(database.get_db)):
+    cities = db.query(models.City).all()
+    return cities
 
 
-async def update_city_by_id(
+def update_city_by_id(
         city_id: int,
         city: city_schemas.City,
         db: Session = Depends(database.get_db)
 ):
-    db_city = await get_city_by_id(city_id, db)
+    db_city = get_city_by_id(city_id, db)
 
     for attr, value in city.dict().items():
         setattr(db_city, attr, value)
@@ -56,11 +54,11 @@ async def update_city_by_id(
     return "Updated"
 
 
-async def delete_city_by_id(
+def delete_city_by_id(
         city_id: int,
         db: Session = Depends(database.get_db)
 ):
-    db_city = await get_city_by_id(city_id, db)
+    db_city = get_city_by_id(city_id, db)
     db.delete(db_city)
     db.commit()
     return "Deleted"
